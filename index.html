@@ -4,6 +4,7 @@
 <html>
     <head>
         <title>Memetrade</title>
+        <link rel="stylesheet" href="fontawesome/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="main.css">
     </head>
     <body bgcolor="#3B3B3B">
@@ -80,6 +81,15 @@
             *MARKET CLOSED WHEN RED
         </div>
 
+        <div class='container'>
+            <div class='search-container'>
+                <a class='button'>
+                    <i class='fa fa-search' style='#FFF'></i>
+                </a>
+                <input class='search-bar' placeholder='search for memes' type='text'>
+            </div>
+        </div>
+
         <div id="grph">
             <canvas id="myChart" width="100" height="47"></canvas>
         </div>
@@ -152,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var date = new Date();
     var hours = date.getHours(), minutes = date.getMinutes(), seconds = date.getSeconds();
 
-    if(hours >= 8) setColor("#0c0");
-    else setColor("#c00");
+    if(hours >= 12) setColor("#0c0", "0 0 50px rgba(0,255,0,0.7)");
+    else setColor("#c00", "0 0 50px rgba(255,0,0,0.7)");
 
     setNumber(_hours[0], Math.floor(hours/10), 1);
     setNumber(_hours[1], hours%10, 1);
@@ -166,14 +176,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 1000);
 });
 
-var setColor = function(selColor) {
+var setColor = function(selColor, glow) {
     var colordig = document.querySelectorAll(".digit .segment");
     var colorsep = document.querySelectorAll(".separator");
+    var colorglw = document.querySelectorAll(".digit .segment.on, .separator");
+
     for(var i=0; i < colordig.length; ++i) {
         colordig[i].style["background"] = selColor;
     }
     for(var i=0; i < colorsep.length; ++i) {
         colorsep[i].style["background"] = selColor;
+    }
+    for(var i=0; i < colorglw.length; ++i) {
+        colorglw[i].style["box-shadow"] = glow;
     }
 }
 
@@ -206,11 +221,11 @@ var setNumber = function(digit, number, on) {
 
 var date = new Date();
 
-function getMonthSlice() {
+function getMonthSlice(amount) {
     const months = ["January", "February", "March", "April", "May", "June", "July",
                     "August", "September", "October", "November", "December"];
     var slc = date.getMonth();
-    return months.slice(((12+slc)-6)%12, slc);
+    return months.slice(((12+slc)-amount)%12, slc);
 }
 // Generates readable color against black background
 function generateColor() {
@@ -224,7 +239,7 @@ function generateColor() {
 }
 
 var data = {
-    labels: getMonthSlice(),
+    labels: getMonthSlice(6),
     datasets: [
         {
             label: "PEPE",
