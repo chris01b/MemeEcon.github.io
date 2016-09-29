@@ -136,7 +136,7 @@ html, body {
 
 .digit .segment.on, .separator {
   opacity:1;
-  box-shadow:0 0 50px rgba(255,0,0,0.7);
+  box-shadow:0 0 50px rgba(255,0,0,0.6);
   transition:opacity 0s;
   -webkit-transition:opacity 0s;
   -ms-transition:opacity 0s;
@@ -210,10 +210,9 @@ html, body {
 
 .container {
   position:absolute;
-  display: block;
-  width: 25em;
-  margin: 100px auto;
-  left:76%;
+  width: 0em;
+  top:11%;
+  left:99%;
 }
 
 .search-container {
