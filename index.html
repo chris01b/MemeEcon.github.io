@@ -1,8 +1,252 @@
 <!DOCTYPE html>
 
+<script src="Chart.min.js"></script>
 <html>
-    <body>
-        <h1>Hello World</h1>
-        <p>Hosted with GitHub Pages.</p>
+    <head>
+        <title>Memetrade</title>
+        <link rel="stylesheet" type="text/css" href="main.css">
+    </head>
+    <body bgcolor="#3B3B3B">
+        <div>
+            <img class="logo" src="memetradelogo.png" alt="MEMETRADE"/>
+        </div>
+        <div class="clock">
+          <div class="digit hours">
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+          </div>
+
+          <div class="digit hours">
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+          </div>
+
+          <div class="separator"></div>
+
+          <div class="digit minutes">
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+          </div>
+
+          <div class="digit minutes">
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+          </div>
+
+          <div class="separator"></div>
+
+          <div class="digit seconds">
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+          </div>
+
+          <div class="digit seconds">
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+            <div class="segment"></div>
+          </div>
+        </div>
+
+        <div class="reminder">
+            *MARKET CLOSED WHEN RED
+        </div>
+
+        <div id="grph">
+            <canvas id="myChart" width="100" height="47"></canvas>
+        </div>
+        <div class="tabs">
+            <div class="tab-2">
+                <label for="tab2-1">1D</label>
+                <input id="tab2-1" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-2">5D</label>
+                <input id="tab2-2" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-3">1M</label>
+                <input id="tab2-3" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-4">6M</label>
+                <input id="tab2-4" name="tabs-two" type="radio" checked="checked">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-5">1Y</label>
+                <input id="tab2-5" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-6">2Y</label>
+                <input id="tab2-6" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-7">5Y</label>
+                <input id="tab2-7" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-8">10Y</label>
+                <input id="tab2-8" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-9">MAX</label>
+                <input id="tab2-9" name="tabs-two" type="radio">
+            </div>
+            <div class="tab-2">
+                <label for="tab2-10">LIVE</label>
+                <input id="tab2-10" name="tabs-two" type="radio">
+            </div>
+        </div>
     </body>
 </html>
+
+<script>
+// Clock
+var digitSegments = [
+    [1,2,3,4,5,6],
+    [2,3],
+    [1,2,7,5,4],
+    [1,2,7,3,4],
+    [6,7,2,3],
+    [1,6,7,3,4],
+    [1,6,5,4,3,7],
+    [1,2,3],
+    [1,2,3,4,5,6,7],
+    [1,2,7,3,6]
+]
+
+document.addEventListener('DOMContentLoaded', function() {
+  var _hours = document.querySelectorAll('.hours');
+  var _minutes = document.querySelectorAll('.minutes');
+  var _seconds = document.querySelectorAll('.seconds');
+
+  setInterval(function() {
+    var date = new Date();
+    var hours = date.getHours(), minutes = date.getMinutes(), seconds = date.getSeconds();
+
+    setNumber(_hours[0], Math.floor(hours/10), 1);
+    setNumber(_hours[1], hours%10, 1);
+
+    setNumber(_minutes[0], Math.floor(minutes/10), 1);
+    setNumber(_minutes[1], minutes%10, 1);
+
+    setNumber(_seconds[0], Math.floor(seconds/10), 1);
+    setNumber(_seconds[1], seconds%10, 1);
+  }, 1000);
+});
+
+var setNumber = function(digit, number, on) {
+  var segments = digit.querySelectorAll('.segment');
+  var current = parseInt(digit.getAttribute('data-value'));
+
+  // only switch if number has changed or wasn't set
+  if (!isNaN(current) && current != number) {
+    // unset previous number
+    digitSegments[current].forEach(function(digitSegment, index) {
+      setTimeout(function() {
+        segments[digitSegment-1].classList.remove('on');
+      }, index*45)
+    });
+  }
+
+  if (isNaN(current) || current != number) {
+    // set new number after
+    setTimeout(function() {
+      digitSegments[number].forEach(function(digitSegment, index) {
+        setTimeout(function() {
+          segments[digitSegment-1].classList.add('on');
+        }, index*45)
+      });
+    }, 250);
+    digit.setAttribute('data-value', number);
+  }
+}
+
+var date = new Date();
+
+function getMonthSlice() {
+    const months = ["January", "February", "March", "April", "May", "June", "July",
+                    "August", "September", "October", "November", "December"];
+    var slc = date.getMonth();
+    return months.slice(((12+slc)-6)%12, slc);
+}
+// Generates readable color against black background
+function generateColor() {
+    var str = "rgba("
+    for(var i = 0; i < 3; ++i) {
+        str += Math.floor(Math.random() * (255-127)+127);
+        str += ",";
+    }
+    str+="1)";
+    return str;
+}
+
+var data = {
+    labels: getMonthSlice(),
+    datasets: [
+        {
+            label: "PEPE",
+            fill: true,
+            lineTension: 0.1,
+            backgroundColor: "rgba(97,106,107,0.4)",
+            borderColor: generateColor(),
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(255,255,255,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: [65, 59, 80, 81, 56, 55],
+            spanGaps: false,
+        }
+    ]};
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+        scales: {
+                xAxes: [{
+                    display: true
+                }]
+            }
+        }
+    });
+    Chart.defaults.global.defaultFontColor = '#C2C2C2';
+    Chart.defaults.global.maintainAspectRatio = false;
+</script>
