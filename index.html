@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
 <script src="Chart.min.js"></script>
+<!-- <script src="jquery-3.1.1.min.js"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
 <html>
     <head>
         <title>Memetrade</title>
@@ -180,15 +182,16 @@ var setColor = function(selColor, glow) {
     var colordig = document.querySelectorAll(".digit .segment");
     var colorsep = document.querySelectorAll(".separator");
     var colorglw = document.querySelectorAll(".digit .segment.on, .separator");
-
-    for(var i=0; i < colordig.length; ++i) {
-        colordig[i].style["background"] = selColor;
-    }
-    for(var i=0; i < colorsep.length; ++i) {
-        colorsep[i].style["background"] = selColor;
-    }
-    for(var i=0; i < colorglw.length; ++i) {
-        colorglw[i].style["box-shadow"] = glow;
+    if(colordig[0].style["background"] != selColor){
+        for(var i=0; i < colordig.length; ++i) {
+            colordig[i].style["background"] = selColor;
+        }
+        for(var i=0; i < colorsep.length; ++i) {
+            colorsep[i].style["background"] = selColor;
+        }
+        for(var i=0; i < colorglw.length; ++i) {
+            colorglw[i].style["box-shadow"] = glow;
+        }
     }
 }
 
@@ -237,6 +240,21 @@ function generateColor() {
     str+="1)";
     return str;
 }
+
+// fetch data placeholder
+// IT'S ALIVE!
+function fetchData(){
+    var _url = 'https://www.google.com/trends/api/widgetdata/multiline/csv?req=%7B%22time%22%3A%222011-09-29%202016-09-29%22%2C%22resolution%22%3A%22WEEK%22%2C%22locale%22%3A%22en-US%22%2C%22comparisonItem%22%3A%5B%7B%22geo%22%3A%7B%7D%2C%22complexKeywordsRestriction%22%3A%7B%22keyword%22%3A%5B%7B%22type%22%3A%22BROAD%22%2C%22value%22%3A%22pepe%22%7D%5D%7D%7D%5D%2C%22requestOptions%22%3A%7B%22property%22%3A%22%22%2C%22backend%22%3A%22IZG%22%2C%22category%22%3A0%7D%7D&token=APP6_UEAAAAAV-78egN5ej4KQoUz-lP9xlD5u4zdkQrs&tz=240';
+    var succ = function(data){
+        console.log(data);
+    }
+    $.ajax({
+        url: 'https://crossorigin.me/'+_url,
+        method:'GET',
+        success:succ
+    });
+}
+fetchData();
 
 var data = {
     labels: getMonthSlice(6),
