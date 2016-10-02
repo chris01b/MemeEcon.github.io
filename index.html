@@ -109,7 +109,7 @@
             </div>
             <div class="tab-2">
                 <label for="tab2-4">6M</label>
-                <input id="tab2-4" name="tabs-two" type="radio" checked="checked">
+                <input id="tab2-4" name="tabs-two" type="radio">
             </div>
             <div class="tab-2">
                 <label for="tab2-5">1Y</label>
@@ -129,7 +129,7 @@
             </div>
             <div class="tab-2">
                 <label for="tab2-9">MAX</label>
-                <input id="tab2-9" name="tabs-two" type="radio">
+                <input id="tab2-9" name="tabs-two" type="radio" checked="checked">
             </div>
             <div class="tab-2">
                 <label for="tab2-10">LIVE</label>
@@ -158,6 +158,20 @@ var digitSegments = [
     [1,2,3,4,5,6,7],
     [1,2,7,3,6]
 ]
+
+function createLoader() {
+    var basediv = document.createElement('div');
+    basediv.className = 'spinner';
+    document.getElementsByTagName('body')[0].appendChild(basediv);
+
+    var innerDiv1 = document.createElement('div'); innerDiv1.className = 'bounce1';
+    var innerDiv2 = document.createElement('div'); innerDiv2.className = 'bounce2';
+    var innerDiv3 = document.createElement('div'); innerDiv3.className = 'bounce3';
+
+    basediv.appendChild(innerDiv1); basediv.appendChild(innerDiv2); basediv.appendChild(innerDiv3);
+}
+
+createLoader();
 
 document.addEventListener('DOMContentLoaded', function() {
   var _hours = document.querySelectorAll('.hours');
@@ -289,7 +303,13 @@ function getDataFromGT(dstring) {
     }
     return d;
 }
+
+function deleteLoader() {
+    $('.spinner').remove();
+}
+
 function afterSync () {
+    deleteLoader();
     dataChart = {
         labels: getDatesFromGT(dataString),
         datasets: [
@@ -335,6 +355,7 @@ function afterSync () {
             if(event.keyCode == 13) {
                 featuredQuote = keyinput.value;
                 myChart.destroy();
+                createLoader();
                 fetchData(featuredQuote);
             }
         }
