@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 
 <script src="Chart.min.js"></script>
-<!-- <script src="jquery-3.1.1.min.js"></script> -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="jquery-3.1.1.min.js"></script>
 <html>
     <head>
         <title>Memetrade</title>
@@ -88,7 +87,7 @@
                 <a class='button'>
                     <i class='fa fa-search' style='#FFF'></i>
                 </a>
-                <input class='search-bar' placeholder='search for memes' type='text'>
+                <input class='search-bar' placeholder='search for memes' type='text' onkeydown='reload(this)'>
             </div>
         </div>
 
@@ -141,6 +140,11 @@
 </html>
 
 <script>
+// global vars
+var dataChart;
+var featuredQuote = 'pepe';
+var reload;
+
 // Clock
 var digitSegments = [
     [1,2,3,4,5,6],
@@ -222,9 +226,8 @@ var setNumber = function(digit, number, on) {
   }
 }
 
-var date = new Date();
-
 function getMonthSlice(amount) {
+    var date = new Date();
     const months = ["January", "February", "March", "April", "May", "June", "July",
                     "August", "September", "October", "November", "December"];
     var slc = date.getMonth();
@@ -241,59 +244,99 @@ function generateColor() {
     return str;
 }
 
-// fetch data placeholder
-// IT'S ALIVE!
-function fetchData(){
-    var _url = 'https://www.google.com/trends/api/widgetdata/multiline/csv?req=%7B%22time%22%3A%222011-09-29%202016-09-29%22%2C%22resolution%22%3A%22WEEK%22%2C%22locale%22%3A%22en-US%22%2C%22comparisonItem%22%3A%5B%7B%22geo%22%3A%7B%7D%2C%22complexKeywordsRestriction%22%3A%7B%22keyword%22%3A%5B%7B%22type%22%3A%22BROAD%22%2C%22value%22%3A%22pepe%22%7D%5D%7D%7D%5D%2C%22requestOptions%22%3A%7B%22property%22%3A%22%22%2C%22backend%22%3A%22IZG%22%2C%22category%22%3A0%7D%7D&token=APP6_UEAAAAAV-78egN5ej4KQoUz-lP9xlD5u4zdkQrs&tz=240';
-    var succ = function(data){
-        console.log(data);
-    }
+// string for google to interpret
+function generateDateRange(rangeByMonth){
+    var date = new Date();
+    var cyear = date.getFullYear();
+    var cmonth = date.getMonth();
+    var cday = date.getDate();
+
+    var yearspan = Math.floor(rangeByMonth/12);
+    var dateLow = (cyear-yearspan)+'-'+((cmonth-rangeByMonth)%12)+'-'+cday;
+    var dateCurrent = cyear+'-'+cmonth+'-'+cday;
+    return dateLow + "%20" + dateCurrent;
+}
+
+// fetch data
+var dataString;
+var fetchData = function(keyword){
+    var _url = 'https://www.google.com/trends/fetchComponent?hl=en-US&q='+keyword+'&cid=TIMESERIES_GRAPH_0&export=3';
     $.ajax({
         url: 'https://crossorigin.me/'+_url,
         method:'GET',
-        success:succ
+        success:function(data) {
+            dataString = data;
+            afterSync();
+        }
     });
 }
-fetchData();
 
-var data = {
-    labels: getMonthSlice(6),
-    datasets: [
-        {
-            label: "PEPE",
-            fill: true,
-            lineTension: 0.1,
-            backgroundColor: "rgba(97,106,107,0.4)",
-            borderColor: generateColor(),
-            borderCapStyle: 'butt',
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: 'miter',
-            pointBorderColor: "rgba(255,255,255,1)",
-            pointBackgroundColor: "#fff",
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: "rgba(75,192,192,1)",
-            pointHoverBorderColor: "rgba(220,220,220,1)",
-            pointHoverBorderWidth: 2,
-            pointRadius: 1,
-            pointHitRadius: 10,
-            data: [65, 59, 80, 81, 56, 55],
-            spanGaps: false,
-        }
-    ]};
-    var ctx = document.getElementById("myChart");
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: data,
-        options: {
-        scales: {
-                xAxes: [{
-                    display: true
-                }]
+fetchData(featuredQuote);
+
+function getDatesFromGT(dstring) {
+    d = dstring.match(/"\w+ \d{4}\"/g);
+    for(var i = 0; i < d.length; ++i) {
+        d[i] = d[i].replace(/"/g, '');
+    }
+    return d;
+}
+function getDataFromGT(dstring) {
+    var d = dstring.match(/\"\d+\"/g);
+    d.splice(0,1);
+    for(var i = 0; i < d.length; ++i) {
+        d[i] = d[i].replace(/"/g, '');
+        d[i] = parseInt(d[i]);
+    }
+    return d;
+}
+function afterSync () {
+    dataChart = {
+        labels: getDatesFromGT(dataString),
+        datasets: [
+            {
+                label: featuredQuote,
+                fill: true,
+                lineTension: 0.1,
+                backgroundColor: "rgba(97,106,107,0.4)",
+                borderColor: generateColor(),
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(255,255,255,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: getDataFromGT(dataString),
+                spanGaps: false,
+            }
+        ]};
+        var ctx = document.getElementById("myChart");
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: dataChart,
+            options: {
+            scales: {
+                    xAxes: [{
+                        display: true
+                    }]
+                }
+            }
+        });
+        Chart.defaults.global.defaultFontColor = '#C2C2C2';
+        Chart.defaults.global.maintainAspectRatio = false;
+        $('.search-bar').val('');
+        reload = function(keyinput) {
+            if(event.keyCode == 13) {
+                featuredQuote = keyinput.value;
+                myChart.destroy();
+                fetchData(featuredQuote);
             }
         }
-    });
-    Chart.defaults.global.defaultFontColor = '#C2C2C2';
-    Chart.defaults.global.maintainAspectRatio = false;
+    }
 </script>
