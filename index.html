@@ -87,7 +87,7 @@
                 <a class='button'>
                     <i class='fa fa-search' style='#FFF'></i>
                 </a>
-                <input class='search-bar' placeholder='search for memes' type='text' onkeydown='reload(this)'>
+                <input class='search-bar' placeholder='search for memes' type='text'>
             </div>
         </div>
 
@@ -144,6 +144,12 @@
 var dataChart;
 var featuredQuote = 'pepe';
 var reload;
+var keyevent;
+$('body').keypress(function(evt) {
+    if(evt.target = 'input.search-bar'){
+        reload(evt);
+    }
+});
 
 // Clock
 var digitSegments = [
@@ -351,9 +357,9 @@ function afterSync () {
         Chart.defaults.global.defaultFontColor = '#C2C2C2';
         Chart.defaults.global.maintainAspectRatio = false;
         $('.search-bar').val('');
-        reload = function(keyinput) {
-            if(event.keyCode == 13) {
-                featuredQuote = keyinput.value;
+        reload = function(e) {
+            if(e.keyCode == 13) {
+                featuredQuote = $('.search-bar').val();
                 myChart.destroy();
                 createLoader();
                 fetchData(featuredQuote);
