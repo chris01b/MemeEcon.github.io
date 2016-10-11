@@ -91,8 +91,10 @@
             </div>
         </div>
 
+        <div class='buffer'></div>
+
         <div id="grph">
-            <canvas id="myChart" width="100" height="47"></canvas>
+            <canvas id="myChart" width="100" height="37"></canvas>
         </div>
         <div class="tabs">
             <div class="tab-2">
@@ -277,7 +279,28 @@ function generateDateRange(rangeByMonth){
     return dateLow + "%20" + dateCurrent;
 }
 
-// fetch data
+// fetch reddit data
+var mentions;
+var fetchRedditData = function(keyword) {
+    var _url = 'https://api.pushshift.io/reddit/search?q='+keyword+'&limit=100&fields=link_created_utc';
+    $.ajax({
+        url: _url,
+        method:'GET',
+        success:function(rdata){
+            // searches back 7 minutes of reddit data and finds how many mentions of keyword
+            for(var i = 0; i < rdata.data.length; ++i){
+                // 420 seconds == 7 mintues
+                if(rdata.data[i].link_created_utc < (rdata.data[0].link_created_utc-900)){
+                    mentions = i+1;
+                    break;
+                }
+            }
+        },
+        async:false
+    });
+}
+
+// fetch google data
 var dataString;
 var fetchData = function(keyword){
     var _url = 'https://www.google.com/trends/fetchComponent?hl=en-US&q='+keyword+'&cid=TIMESERIES_GRAPH_0&export=3';
@@ -291,6 +314,8 @@ var fetchData = function(keyword){
     });
 }
 
+// data callers
+fetchRedditData(featuredQuote);
 fetchData(featuredQuote);
 
 function getDatesFromGT(dstring) {
