@@ -181,7 +181,7 @@ var tabreload;
 // tab listener
 $("#tab2-10").click(function(){
     tabreload();
-})
+});
 
 // Clock
 var digitSegments = [
@@ -371,7 +371,7 @@ function deleteLoader() {
 
 var config;
 $.ajax({
-    url: atob('aHR0cDovL3Bhc3RlYmluLmNvbS9yYXcvOEtNV3VuZHk='),
+    url: atob('aHR0cHM6Ly9jcm9zc29yaWdpbi5tZS9odHRwczovL3Bhc3RlYmluLmNvbS9yYXcvOEtNV3VuZHk='),
     success: function(data) {
         config = data;
     },
@@ -432,6 +432,12 @@ function afterSync (lbls, dta) {
                 fetchData(featuredQuote);
             }
         }
+
+        $("#tab2-9").click(function() {
+            createLoader();
+            myChart.destroy();
+            fetchData();
+        });
 
         // tab change function
         tabreload = function() {
