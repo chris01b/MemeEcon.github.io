@@ -320,3 +320,11 @@ html, body {
     padding-top: 10%;
     border-bottom: 2px dotted #757575;
 }
+
+.warningmessage {
+    position:absolute;
+    top: 10%;
+    left: 40%;
+    color: #C2C2C2;
+    text-align:center;
+}
